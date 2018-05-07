@@ -3,3 +3,41 @@
   Using a loop and indexed addressing, write code that rotates the members of a 32-bit integer array 
   forward one position.  The value at the end of the array must wrap around to the first position.  
   For example, the array [10,20,30,40] would be transformed into [40,10,20,30]
+
+
+ExitProcess PROTO
+
+.data
+myArray		QWORD 10d,20d,30d,40d
+finalArray  QWORD 4 DUP(0)
+
+.code
+main proc
+
+	mov rcx, 4
+	mov rsi, 0
+	mov r15, 8	; This is our index multiplier
+
+	POOPLOOP:
+
+	; figure out our loop index and get the current index's value
+	mov rax, rsi
+	mul r15
+	mov rdx, myArray[rax]
+
+	cmp rsi, 3
+	je HandleLast
+
+	mov finalArray[rax + 8], rdx
+	jmp EndLoop
+
+	HandleLast:
+	mov finalArray[0], rdx
+
+	EndLoop:
+	inc rsi
+LOOP POOPLOOP
+
+	call ExitProcess
+main endp
+end
