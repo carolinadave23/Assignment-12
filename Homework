@@ -5,7 +5,11 @@
   For example, the array [10,20,30,40] would be transformed into [40,10,20,30]
 
 
-ExitProcess PROTO
+ExitProcess 	PROTO
+WriteInt64  	PROTO
+Crlf		PROTO
+ReadInt64	PROTO
+
 
 .data
 myArray		QWORD 10d,20d,30d,40d
@@ -16,28 +20,48 @@ main proc
 
 	mov rcx, 4
 	mov rsi, 0
-	mov r15, 8	; This is our index multiplier
+
+	LOOP1:
+
+		mov rax, myArray[rsi * 8]
+		call WriteInt64
+		inc rsi
+
+	LOOP LOOP1
+
+	call Crlf
+	mov rcx, 3
+	mov rsi, 0
+
+
 
 	POOPLOOP:
 
-	; figure out our loop index and get the current index's value
-	mov rax, rsi
-	mul r15
-	mov rdx, myArray[rax]
+		; figure out our loop index and get the current index's value
+		mov rax, myArray[rsi * 8]
+		mov r10, rsi
+		inc r10
+		mov r11, myArray[r10 * 8]
 
-	cmp rsi, 3
-	je HandleLast
+		mov myArray[rsi * 8], r11
+		mov myArray[r10 * 8], rax
 
-	mov finalArray[rax + 8], rdx
-	jmp EndLoop
+		
+		inc rsi
+	LOOP POOPLOOP
 
-	HandleLast:
-	mov finalArray[0], rdx
+	mov rcx, 4
+	mov rsi, 0
 
-	EndLoop:
-	inc rsi
-LOOP POOPLOOP
+	LOOP2:
 
+		mov rax, myArray[rsi * 8]
+		call WriteInt64
+		inc rsi
+
+	LOOP LOOP2
+
+	call ReadInt64
 	call ExitProcess
 main endp
 end
